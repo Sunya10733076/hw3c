@@ -1,0 +1,96 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+struct Node {
+    char data;
+    struct Node* next;
+};
+
+struct Node* createNode(char data) {
+    struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
+    newNode->data = data;
+    newNode->next = NULL;
+    return newNode;
+}
+
+struct Node* reverseLinkedList(struct Node* head, int R) {
+    struct Node* current = head;
+    struct Node* prev = NULL;
+    struct Node* next = NULL;
+    int count = 0;
+
+    while (current != NULL && count < R) {
+        next = current->next;
+        current->next = prev;
+        prev = current;
+        current = next;
+        count++;
+    }
+
+    if (next != NULL) {
+        head->next = reverseLinkedList(next, R);
+    }
+
+    return prev;
+}
+
+struct Node* addLinkedLists(struct Node* l1, struct Node* l2) {
+    struct Node* result = NULL;
+    struct Node* temp = NULL;
+    int carry = 0;
+
+    while (l1 != NULL || l2 != NULL || carry > 0) {
+        int sum = (l1 ? (l1->data >= 'A' ? l1->data - 'A' + 10 : l1->data - '0') : 0) +
+                  (l2 ? (l2->data >= 'A' ? l2->data - 'A' + 10 : l2->data - '0') : 0) + carry;
+        carry = sum / 16;
+
+        char digit = (sum % 16) < 10 ? (sum % 16) + '0' : (sum % 16) - 10 + 'A';
+
+        if (result == NULL) {
+            result = createNode(digit);
+            temp = result;
+        } else {
+            temp->next = createNode(digit);
+            temp = temp->next;
+        }
+
+        if (l1)
+            l1 = l1->next;
+        if (l2)
+            l2 = l2->next;
+    }
+
+    return result;
+}
+
+void printLinkedList(struct Node* head) {
+    while (head != NULL) {
+        printf("%c ", head->data);
+        head = head->next;
+    }
+    printf("\n");
+}
+
+int main() {
+    int R = 3;
+    // Create the two linked lists representing hexadecimal numbers
+    struct Node* l1 = createNode('7');
+    l1->next = createNode('1');
+    l1->next->next = createNode('A');
+    l1->next->next->next = createNode('4');
+
+    struct Node* l2 = createNode('9');
+    l2->next = createNode('7');
+    l2->next->next = createNode('7');
+
+    // Add the linked lists
+    struct Node* sum = addLinkedLists(l1, l2);
+
+    // Reverse the result list every R elements
+    sum = reverseLinkedList(sum, R);
+
+    // Print the modified list
+    printLinkedList(sum);
+
+    return 0;
+}
